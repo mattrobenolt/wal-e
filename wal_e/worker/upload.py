@@ -2,6 +2,7 @@ import errno
 import socket
 import tempfile
 import time
+import http.client
 
 try:
     import boto.exception
@@ -124,6 +125,10 @@ class PartitionUploader(object):
                         detail=standard_detail_message(
                             "The socket error's message is '{0}'."
                             .format(socketmsg)))
+                elif isinstance(typ, http.client.HTTPException):
+                    logger.info(
+                        msg='Retrying send because of an http error',
+                        default=standard_detail_message())
                 elif is_s3_response_error(typ, value):
                     logger.info(
                         msg='Retrying send because of a Request Skew time',
